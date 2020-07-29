@@ -1,0 +1,13 @@
+a71edc6fb257e5161d7cc4927a54ec31 *DESCRIPTION
+c3d025d8b66106359ef82f96ac94fb75 *NAMESPACE
+f0deaf91a0d74758e11b5e45afe461dd *R/data_list.R
+bac9390f4e361f30e2fbc0b16c640743 *R/get_data.R
+8eb6529d73499a6327b3052fc14706b6 *R/zzz.R
+d7400c2a0940c1f55a0033f5ae58d22d *README.md
+387e5dd5a97268a6ea36a921281313c0 *inst/plot.png
+648e0db7d66c2c67111e9da106ed02f8 *man/get_dataset_list.Rd
+a31cdedb06d2ecca547fcdea25049725 *man/get_idbank_list.Rd
+369e22ef44e9aefaeaa72fae1f2e77a9 *man/get_insee.Rd
+4184132109e5e3c45f64f6f5bb5035a1 *man/get_insee_dataset.Rd
+05ad99ecf2f958a12c4c98408201dc8e *man/get_insee_idbank.Rd
+1942939777f0909099a2bc59931880c4 *man/get_insee_title.Rd
