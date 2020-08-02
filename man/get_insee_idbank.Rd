@@ -30,6 +30,50 @@ Get data from INSEE series idbank
 Get data from INSEE series idbank
 }
 \examples{
-data = get_insee_idbank("001558315", firstNObservations = 1)
+\donttest{
+
+#example 1 : import price index of industrial products and turnover index : manufacture of wood
+data = get_insee_idbank("001558315", "010540726")
+
+#example 2 : unemployment data
+
+library(tidyverse)
+
+idbank_list = get_idbank_list()
+
+df_idbank_list_selected =
+  idbank_list \%>\%
+  filter(nomflow == "CHOMAGE-TRIM-NATIONAL") \%>\%  #unemployment dataset
+  filter(dim5 == 0) \%>\% #men and women
+  mutate(title = get_insee_title(idbank))
+
+idbank_list_selected = df_idbank_list_selected \%>\% pull(idbank)
+
+unem = get_insee_idbank(idbank_list_selected)
+
+#example 3 : French GDP growth rate
+
+library(tidyverse)
+
+idbank_list = get_idbank_list()
+
+df_idbank_list_selected =
+  idbank_list \%>\%
+  filter(nomflow == "CNT-2014-PIB-EQB-RF") \%>\%  # Gross domestic product balance
+  filter(dim1 == "T") \%>\% #quarter
+  filter(dim4 == "PIB") \%>\% #GDP
+  filter(dim6 == "TAUX") \%>\% #rate
+  filter(dim10 == "CVS-CJO") #SA-WDA, seasonally adjusted, working day adjusted
+
+idbank = idbank_list_selected \%>\% pull(idbank)
+
+data = get_insee_idbank(idbank)
+
+#plot
+ggplot(data, aes(x = DATE, y = OBS_VALUE)) +
+geom_col() +
+ggtitle("French GDP growth rate, quarter-on-quarter, sa-wda") +
+labs(subtitle = sprintf("Last updated : \%s", data$TIME_PERIOD[1]))
+}
 
 }
