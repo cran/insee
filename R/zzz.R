@@ -1,6 +1,9 @@
 
 #' @noRd
 .onLoad <- function(libname, pkgname){
+
+  Sys.setenv(INSEE_sdmx_link_codelist = "https://www.bdm.insee.fr/series/sdmx/codelist/FR1")
+  Sys.setenv(INSEE_sdmx_link_datastructure = "https://www.bdm.insee.fr/series/sdmx/datastructure/FR1")
   Sys.setenv(INSEE_sdmx_link_dataflow = "https://bdm.insee.fr/series/sdmx/dataflow")
   Sys.setenv(INSEE_sdmx_link_idbank = "https://bdm.insee.fr/series/sdmx/data/SERIES_BDM")
   Sys.setenv(INSEE_sdmx_link_dataset = "https://bdm.insee.fr/series/sdmx/data")
@@ -18,5 +21,6 @@
   Sys.setenv(INSEE_download_option_idbank_list = "wb")
   Sys.setenv(INSEE_no_cache_use = "FALSE")
   Sys.setenv(INSEE_print_query = "FALSE")
-  Sys.setenv(INSEE_read_sdmx_slow = "FALSE")
+  Sys.setenv(INSEE_today_date = as.character(Sys.Date()))
+  Sys.setenv(INSEE_read_sdmx_fast = "FALSE")
 }

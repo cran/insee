@@ -2,28 +2,47 @@ testthat::context("class and output tests")
 library(testthat)
 library(insee)
 library(tidyverse)
+library(lubridate)
 
 test_that("class tests",{
   skip_on_cran()
 
+  expect_warning(create_insee_folder(), regexp = NA)
   expect_warning(insee:::.onLoad(), regexp = NA)
 
-  expect_equal(c(class(get_idbank_list())[3], class(get_idbank_list())[3]),
-               c("data.frame", "data.frame"))
+  Sys.setenv(INSEE_idbank_dataset_path = "https://www.insee.fr/en/statistiques/fichier/fake_file.zip")
+  expect_equal(any(class(get_idbank_list("CLIMAT-AFFAIRES")) == 'data.frame'), TRUE)
+  Sys.setenv(INSEE_idbank_dataset_path = "https://www.insee.fr/en/statistiques/fichier/2868055/2020_correspondance_idbank_dimension.zip")
+
+  expect_equal(any(class(get_idbank_list("CLIMAT-AFFAIRES")) == 'data.frame'), TRUE)
+  expect_equal(any(class(get_idbank_list(update = TRUE)) == 'data.frame'), TRUE)
+  expect_equal(any(class(get_idbank_list()) == 'data.frame'), TRUE)
+
+  Sys.setenv("INSEE_today_date" = as.character(lubridate::today() %m+% days(91)))
+  expect_equal(any(class(get_idbank_list()) == 'data.frame'), TRUE)
+  Sys.setenv("INSEE_today_date" = as.character(lubridate::today()))
 
   idbank_test1 = get_idbank_list() %>% slice(1) %>% pull(idbank)
   idbank_test2 = get_idbank_list() %>% slice(2) %>% pull(idbank)
 
-  expect_is(get_idbank_list("CNA-2014-CPEB"), "data.frame")
-  expect_is(get_dataset_list(), "data.frame")
+  expect_equal(any(class(get_idbank_list("CNA-2014-CPEB")) == 'data.frame'), TRUE)
+  expect_equal(any(class(get_idbank_list("BALANCE-PAIEMENTS", "CNA-2014-CPEB",
+                                         dataset = "CNA-2010-FBCF-BRANCHE")) == 'data.frame'), TRUE)
+
+  expect_equal(any(class(get_dataset_list()) == 'data.frame'), TRUE)
+
+  expect_equal(any(class(get_last_release()) == 'data.frame'), TRUE)
+  expect_equal(any(class(get_last_release()) == 'data.frame'), TRUE)
 
   Sys.setenv(INSEE_print_query = "TRUE")
   insee_link = "http://www.bdm.insee.fr/series/sdmx/data/SERIES_BDM"
   insee_query = file.path(insee_link, paste0(idbank_test1,"?", "firstNObservations=1"))
 
-  expect_is(get_last_release(), "data.frame")
+  # test readsdmx parser
+  Sys.setenv(INSEE_read_sdmx_fast = "TRUE")
+  expect_equal(any(class(get_insee(insee_query)) == 'data.frame'), TRUE)
+  Sys.setenv(INSEE_read_sdmx_fast = "FALSE")
 
-  expect_is(get_insee(insee_query), "data.frame")
   expect_is(get_insee(), "NULL")
   expect_is(get_insee(""), "NULL")
 
@@ -46,7 +65,23 @@ test_that("class tests",{
 
   expect_is(get_date("2010-05", "M"), "Date")
 
-  expect_is(search_insee("gdp"), "data.frame")
+  expect_is(search_insee("gdp|Paris"), "data.frame")
+  expect_is(search_insee(""), "data.frame")
+  expect_is(search_insee(NULL), "data.frame")
+
+  Sys.setenv("INSEE_download_option_idbank_list" = "a")
+  expect_is(download_idbank_list(label = TRUE), "data.frame")
+  expect_is(download_idbank_list(dataset = "CNA-2010-TOF", label = TRUE), "data.frame")
+  expect_warning(download_idbank_list("a"))
+
+  expect_is(get_column_title("CNA-2014-CONSO-MEN"), "data.frame")
+  expect_is(get_column_title("CNA-2014-CONSO-MEN"), "data.frame")
+  expect_is(get_column_title(), "data.frame")
+  expect_is(get_column_title("a"), "NULL")
+
+  expect_is(get_dataset_dimension("a"), "NULL")
+
+
 })
 
 test_that("output tests",{
@@ -70,6 +105,7 @@ test_that("output tests",{
 
   expect_equal(nrow(split_title(get_insee_idbank(idbank_test1, firstNObservations = 1))), 1)
   expect_equal(nrow(split_title(get_insee_idbank(idbank_test1, firstNObservations = 1), lang = "fr")), 1)
+  expect_equal(nrow(split_title(get_insee_idbank(idbank_test1, firstNObservations = 1), lang = "en")), 1)
   expect_equal(nrow(get_insee_idbank(idbank_test401, firstNObservations = 1)), length(idbank_test401))
   expect_message(nrow(get_insee_idbank(idbank_test401, firstNObservations = 1)))
 
@@ -77,7 +113,8 @@ test_that("output tests",{
   expect_is(get_insee_idbank(idbank_test1201, firstNObservations = 1), "NULL")
   expect_message(get_insee_idbank(idbank_test1201, firstNObservations = 1))
 
-  expect_equal(nrow(get_insee_idbank("001769682")) < nrow(get_insee_idbank("001769682", includeHistory = TRUE)), TRUE)
+  expect_equal(nrow(get_insee_idbank("001769682")) <
+                 nrow(get_insee_idbank("001769682", includeHistory = TRUE)), TRUE)
 
   expect_equal(nrow(get_insee_dataset("IPC-2015", filter = "M......ENSEMBLE...CVS.2015")) <
                  nrow(get_insee_dataset(
@@ -85,5 +122,40 @@ test_that("output tests",{
                    filter = "M......ENSEMBLE...CVS.2015",
                    includeHistory = TRUE,
                    updatedAfter = "2017-07-11T08:45:00")), TRUE)
+
+  Sys.setenv("INSEE_download_verbose" = "TRUE")
+  Sys.setenv("INSEE_no_cache_use" = "TRUE")
+
+  expect_equal(ncol(get_insee_idbank("001769682") %>% add_insee_metadata())
+               > ncol(get_insee_idbank("001769682")), TRUE)
+
+  expect_equal(ncol(get_idbank_list("CNA-2014-CPEB")) > 0, TRUE)
+
+  Sys.setenv("INSEE_no_cache_use" = "TRUE")
+  expect_equal("data.frame" %in% class(get_insee_idbank("001769682")), TRUE)
+  Sys.setenv("INSEE_no_cache_use" = "FALSE")
+
+  expect_equal(is.null(get_idbank_list("a")), TRUE)
+
+  expect_equal("data.frame" %in%
+                 class(read_dataset_metadata(dataset = c("BALANCE-PAIEMENTS", "CLIMAT-AFFAIRES"))), TRUE)
+
+  Sys.setenv("INSEE_download_verbose" = "FALSE")
+  link = "https://bdm.insee.fr/series/sdmx/data/IPC-2015"
+
+  expect_is(get_insee_dataset("IPC-2015"), "NULL")
+  expect_is(read_sdmx_slow(link), "NULL")
+  expect_is(read_sdmx_fast(link), "NULL")
+
+  # columns name and fixed order
+  link = "https://bdm.insee.fr/series/sdmx/data/CLIMAT-AFFAIRES"
+  df_slow = read_sdmx_slow(link)
+  df_fast = read_sdmx_fast(link)
+  expect_equal(all(names(df_slow) == names(df_fast)), TRUE)
+
+  expect_warning(clean_insee_folder(), regexp = NA)
+  expect_equal(read_dataset_metadata("CLIMAT-AFFAIRES"), TRUE)
+  expect_equal('data.frame' %in% class(get_dimension_values('CL_NATURE', 'NATURE', name = TRUE)), TRUE)
+
 })
 

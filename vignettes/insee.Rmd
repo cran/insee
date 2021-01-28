@@ -8,7 +8,7 @@ output:
     includes:
       # in_header: header.html
 vignette: >
-  %\VignetteIndexEntry{Turorial} 
+  %\VignetteIndexEntry{Tutorial} 
   %\VignetteEngine{knitr::rmarkdown} 
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{kableExtra,magrittr,htmltools}
@@ -16,6 +16,7 @@ vignette: >
 
 ```{r setup,echo=FALSE, include=FALSE}
 # setup chunk
+# Sys.setenv("NOT_CRAN" = "TRUE")
 NOT_CRAN <- identical(tolower(Sys.getenv("NOT_CRAN")),"true")
 knitr::opts_chunk$set(purl = NOT_CRAN)
 library(insee)
@@ -63,17 +64,15 @@ Sys.setenv(https_proxy = "my_proxy_server")
 You can easily install [insee](https://CRAN.R-project.org/package=insee) with the following code :
 
 ```{r, message = FALSE, warning = FALSE, eval = FALSE}
-# Get the development version from GitHub (required for the tutorial)
+# Get the development version from GitHub 
 # install.packages("devtools")
-devtools::install_github("hadrilec/insee")
+devtools::install_github("InseeFr/R-Insee-Data")
 
 # CRAN version
 # install.packages("insee")
 
 # library Loading
-
 library(insee)
-# tutorial's examples use tidyverse's packages
 library(tidyverse)
 ```
 
@@ -87,11 +86,11 @@ Series have two identifiers the SDMX identifier and the so called idbank. Both c
 
 [INSEE BDM database](https://www.insee.fr/en/information/2512785) offers more than 200 Datasets. The <code>get_dataset_list()</code> function returns the datasets catalogue :
 
-```{r, message = FALSE, warning = FALSE, eval = TRUE}
+```{r, message = FALSE, warning = FALSE, eval = FALSE}
 insee_dataset = get_dataset_list() 
 ```
 
-```{r echo = FALSE, message = FALSE, warning = FALSE, eval = TRUE}
+```{r echo = FALSE, message = FALSE, warning = FALSE, eval = FALSE}
 rownames(insee_dataset) <- NULL
 
 insee_dataset %>% 
@@ -103,13 +102,15 @@ insee_dataset %>%
 
 ## Series Keys List
 
-[INSEE BDM database](https://www.insee.fr/en/information/2512785) currently offers more than 140 000 series. The <code>get_idbank_list</code> function returns the series catalogue.
+[INSEE BDM database](https://www.insee.fr/en/information/2512785) currently offers more than 150 000 series. The <code>get_idbank_list</code> function returns the series catalogue from a dataset name.
 
-```{r, message=FALSE,warning=FALSE,eval=TRUE}
-idbank_list = get_idbank_list()
+```{r, message=FALSE,warning=FALSE,eval=FALSE}
+idbank_list = get_idbank_list('BALANCE-PAIEMENTS')
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE,eval=TRUE}
+```{r echo=FALSE, message=FALSE, warning=FALSE,eval=FALSE}
+idbank_list = get_idbank_list()
+
 rownames(idbank_list) <- NULL
 
 idbank_list %>% 
@@ -127,23 +128,34 @@ idbank_list %>%
 ## Find a series key
 
 The best way to download data is to find the right series key (idbank), but how ? Indeed, in some cases it is not easy to understand what are the differences among series, especially for non-French speakers.
-To make the search easier, the [insee](https://CRAN.R-project.org/package=insee) package provides the function <code>add_insee_title</code> to get titles from idbanks, either in English or in French. It is not advised to use the function on the whole idbank dataset, as each SDMX query has 400-idbank limit. Then, <code>add_insee_title</code> function splits the list into several lists of 400 idbanks each. Thus, the user should filter the idbank dataset before using the function to avoid as much as possible this bottleneck as the following example shows. After the data retrieval, it is really nice to use the <code>split_title</code> function on the dataframe to get more readable titles easy to use in plots.
+To make the search easier, the best way is to use the <code>get_idbank_list</code> function with a dataset name, then it can be helpful to filter with the columns FREQ, NATURE, UNIT etc.
+Moreover, the [insee](https://CRAN.R-project.org/package=insee) package provides the function <code>add_insee_title</code> to get titles from idbanks, either in English or in French. It is not advised to use the function on the whole idbank dataset, as each SDMX query has 400-idbank limit. Then, <code>add_insee_title</code> function splits the list into several lists of 400 idbanks each. Thus, the user should filter the idbank dataset before using the function to avoid as much as possible this bottleneck as the following example shows. After the data retrieval, it is really nice to use the <code>split_title</code> function on the dataframe to get more readable titles easy to use in plots and 
+<code>add_insee_metadata</code> to get the metadata with the data.
 
 ```{r message=FALSE, warning=FALSE,eval=FALSE}
-idbank_list = get_idbank_list()
 
 idbank_list_selected =
-  idbank_list %>%
-  filter(nomflow == "IPI-2015") %>% #industrial production index dataset
-  filter(dim1 == "M") %>% #monthly
-  filter(dim5 == "INDICE") %>% #index
-  filter(dim8 == "CVS-CJO") %>% #Working day and seasonally adjusted SA-WDA
+  get_idbank_list("IPI-2015") %>% #industrial production index dataset
+  filter(FREQ == "M") %>% #monthly
+  filter(NATURE == "INDICE") %>% #index
+  filter(CORRECTION == "CVS-CJO") %>% #Working day and seasonally adjusted SA-WDA
   #automotive industry and overall industrial production
-  filter(str_detect(dim4,"^29$|A10-BE")) %>% 
+  filter(str_detect(NAF2,"^29$|A10-BE")) %>% 
   add_insee_title()
 
-idbank_list_selected
+```
 
+Another way to find a series key is to perform a keyword-based search with the function <code>search_insee</code>. Beware that this function uses package internal data which might not be the most up-to-date. See the following examples :
+
+```{r message=FALSE, warning=FALSE,eval=FALSE}
+# search multiple patterns
+dataset_survey_gdp = search_insee("Survey|gdp")
+
+# data about paris
+data_paris = search_insee('paris')
+
+# all data
+data_all = search_insee()
 ```
 
 ## Download data
@@ -161,21 +173,24 @@ library(insee)
 # the user can make a manual list of idbanks to get the data 
 # example 1
 
-data = get_insee_idbank("001558315", "010540726")
+data = 
+  get_insee_idbank("001558315", "010540726") %>% 
+  add_insee_metadata()
 
 # using a list of idbanks extracted from the insee idbank dataset
 # example 2 : household's confidence survey
 
-idbank_dataset = get_idbank_list()
-
-df_idbank = idbank_dataset %>%
-  filter(nomflow == "ENQ-CONJ-MENAGES") %>%  #monthly households' confidence survey
-  mutate(title = get_insee_title(idbank)) %>%
-  filter(dim7 == "CVS") #seasonally adjusted
+df_idbank = 
+  get_idbank_list("ENQ-CONJ-MENAGES") %>%  #monthly households' confidence survey
+  add_insee_title() %>% 
+  filter(CORRECTION == "CVS") #seasonally adjusted
 
 list_idbank = df_idbank %>% pull(idbank)
 
-data = get_insee_idbank(list_idbank) %>% split_title()
+data = 
+  get_insee_idbank(list_idbank) %>%
+  split_title() %>% 
+  add_insee_metadata()
 
 # example 3 : get more than 1200 idbanks
 
@@ -220,13 +235,13 @@ data =
 
 # Examples 
 
-* [GDP growth rate](https://hadrilec.github.io/insee/articles/v2_gdp-vignettes.html)
-* [Inflation](https://hadrilec.github.io/insee/articles/v3_inflation-vignettes.html)
-* [Unemployment rate](https://hadrilec.github.io/insee/articles/v4_unem-vignettes.html)
-* [Population by age](https://hadrilec.github.io/insee/articles/v5_pop-vignettes.html)
-* [Population map](https://hadrilec.github.io/insee/articles/v6_pop_map-vignettes.html)
-
+* [GDP growth rate](https://inseefr.github.io/R-Insee-Data/articles/v2_gdp-vignettes.html)
+* [Inflation](https://inseefr.github.io/R-Insee-Data/articles/v3_inflation-vignettes.html)
+* [Unemployment rate](https://inseefr.github.io/R-Insee-Data/articles/v4_unem-vignettes.html)
+* [Population by age](https://inseefr.github.io/R-Insee-Data/articles/v5_pop-vignettes.html)
+* [Population map](https://inseefr.github.io/R-Insee-Data/articles/v6_pop_map-vignettes.html)
+* [Deaths and Births](https://inseefr.github.io/R-Insee-Data/articles/v7_death_birth-vignettes.html)
 
 # Support
-Feel free to contact me with any question about this package using this [e-mail address](mailto:leclerc.hadrien@gmail.com?subject=[r-package][insee]).
+Feel free to contact me with any question about this package using this [e-mail address](mailto:hadrien.leclerc@insee.fr?subject=[r-package][insee]).
 

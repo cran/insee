@@ -3,21 +3,11 @@
 read_sdmx_slow = function(link, step = "1/1"){
 
   insee_download_verbose = if(Sys.getenv("INSEE_download_verbose") == "TRUE"){TRUE}else{FALSE}
-  insee_value_as_numeric = if(Sys.getenv("INSEE_value_as_numeric") == "TRUE"){TRUE}else{FALSE}
 
-  if(insee_download_verbose){
-
-    msg = sprintf("%s - Data download :", step)
-    message(crayon::style(msg, "black"))
-
-    response = try(httr::GET(link, httr::progress()), silent = TRUE)
-
-  }else{
-    response = try(httr::GET(link), silent = TRUE)
-  }
+  response = try(httr::GET(link), silent = TRUE)
 
   if("try-error" %in% class(response)){
-    warning("Wrong query")
+    # warning("Wrong query")
     return(NULL)
   }
 
@@ -30,22 +20,22 @@ read_sdmx_slow = function(link, step = "1/1"){
 
     n_data_obs = length(data[[1]])
 
-    n_series_tot = sum(unlist(lapply(2:n_data_obs,
-                                     function(x){
-                                       n_series = length(data[[1]][[x]])
-
-                                       sum(unlist(lapply(1:n_series,
-                                                         function(i){
-                                                           length(data[[1]][[x]][[i]])
-                                                         }
-                                       )))
-
-                                     }
-    )))
-
-    list_df = list()
-
     if(n_data_obs > 1){
+
+      n_series_tot = sum(unlist(lapply(2:n_data_obs,
+                                       function(x){
+                                         n_series = length(data[[1]][[x]])
+
+                                         sum(unlist(lapply(1:n_series,
+                                                           function(i){
+                                                             length(data[[1]][[x]][[i]])
+                                                           }
+                                         )))
+
+                                       }
+      )))
+
+      list_df = list()
 
       n_series = length(data[[1]][[2]])
 
@@ -103,7 +93,7 @@ read_sdmx_slow = function(link, step = "1/1"){
             list_df[[length(list_df) + 1]] = dataflow_df
           }
 
-          msg = sprintf("%s - Dataframe build : 100%%", step)
+          msg = sprintf("%s - Data download & Dataframe build : 100%%", step)
           message(crayon::style(msg, "black"))
 
           data_final = tibble::as_tibble(dplyr::bind_rows(list_df))
@@ -116,12 +106,12 @@ read_sdmx_slow = function(link, step = "1/1"){
         if(insee_download_verbose){
           if(n_series_tot > 1){
 
-            msg = sprintf("%s - Dataframe build :", step)
+            msg = sprintf("%s - Data download & Dataframe build :", step)
             message(crayon::style(msg, "black"))
 
             pb = utils::txtProgressBar(min = 1, max = n_series_tot, initial = 1, style = 3)
           }else{
-            msg = sprintf("%s - Dataframe build : 100%%", step)
+            msg = sprintf("%s - Data download & Dataframe build : 100%%", step)
             message(crayon::style(msg, "black"))
           }
         }
@@ -165,28 +155,31 @@ read_sdmx_slow = function(link, step = "1/1"){
             }
           }
         }
+
+        if(insee_download_verbose){
+          if(n_series_tot > 1){
+            message(crayon::style("", "black"))
+          }
+        }
+
       }
 
       data_final = dplyr::bind_rows(list_df)
 
-      if(insee_value_as_numeric & "OBS_VALUE" %in% names(data_final)){
-        data_final = dplyr::mutate(.data = data_final,
-                                   OBS_VALUE = as.numeric(as.character(.data$OBS_VALUE)))
-      }
-
-      if("DATE" %in% names(data_final)){
-        col_names_ordered = c("DATE", names(data_final)[which(names(data_final) != "DATE")])
-        data_final = dplyr::select(.data = data_final, tidyselect::all_of(col_names_ordered))
+      if(!dataflow_dwn){
+        data_final = set_data_col(data_final)
       }
 
     }else{
-      warning("The query might be either too big or wrongly done, try to modify it, use filter argument if necessary")
-      warning(data[[1]][[1]][["Text"]][[1]])
+      # warning("The query might be either too big or wrongly done, try to modify it, use filter argument if necessary")
+      # warning(data[[1]][[1]][["Text"]][[1]])
+      # warning("Wrong query")
+
       data_final = NULL
     }
   }else{
-    print(response)
-    stop("Wrong query")
+    # print(response)
+    # stop("Wrong query")
   }
   return(data_final)
 }

@@ -54,13 +54,10 @@ data = get_insee_idbank("001558315", "010540726")
 
 library(tidyverse)
 
-idbank_list = get_idbank_list()
-
 df_idbank_list_selected =
-  idbank_list \%>\%
-  filter(nomflow == "CHOMAGE-TRIM-NATIONAL") \%>\%  #unemployment dataset
-  filter(dim5 == 0) \%>\% #men and women
-  mutate(title = get_insee_title(idbank))
+  get_idbank_list("CHOMAGE-TRIM-NATIONAL") \%>\%  #unemployment dataset
+  filter(SEXE == 0) \%>\% #men and women
+  add_insee_title()
 
 idbank_list_selected = df_idbank_list_selected \%>\% pull(idbank)
 
@@ -70,19 +67,17 @@ unem = get_insee_idbank(idbank_list_selected)
 
 library(tidyverse)
 
-idbank_list = get_idbank_list()
-
 df_idbank_list_selected =
-  idbank_list \%>\%
-  filter(nomflow == "CNT-2014-PIB-EQB-RF") \%>\%  # Gross domestic product balance
-  filter(dim1 == "T") \%>\% #quarter
-  filter(dim4 == "PIB") \%>\% #GDP
-  filter(dim6 == "TAUX") \%>\% #rate
-  filter(dim10 == "CVS-CJO") #SA-WDA, seasonally adjusted, working day adjusted
+  get_idbank_list("CNT-2014-PIB-EQB-RF") \%>\%  # Gross domestic product balance
+  filter(FREQ == "T") \%>\% #quarter
+  filter(OPERATION == "PIB") \%>\% #GDP
+  filter(NATURE == "TAUX") \%>\% #rate
+  filter(CORRECTION == "CVS-CJO") #SA-WDA, seasonally adjusted, working day adjusted
 
 idbank = df_idbank_list_selected \%>\% pull(idbank)
 
-data = get_insee_idbank(idbank)
+data = get_insee_idbank(idbank) \%>\%
+  add_insee_metadata()
 
 #plot
 ggplot(data, aes(x = DATE, y = OBS_VALUE)) +
