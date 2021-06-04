@@ -15,3 +15,50 @@ embed_png <- function(path, dpi = NULL) {
     " />"
   ))}
 
+## ---- echo = FALSE------------------------------------------------------------
+embed_png("inflation.png")
+
+## ----message=FALSE, warning=FALSE, include=FALSE------------------------------
+library(kableExtra)
+library(magrittr)
+library(htmltools)
+library(prettydoc)
+
+## ----message = FALSE, warning=FALSE, eval = FALSE-----------------------------
+#  # please download the Github version
+#  # devtools::install_github("InseeFr/R-Insee-Data")
+#  library(tidyverse)
+#  library(lubridate)
+#  library(insee)
+#  
+#  df_idbank_list_selected =
+#    get_idbank_list("IPC-2015") %>% #Inflation dataset
+#    filter(FREQ == "M") %>% # monthly
+#    filter(str_detect(COICOP2016, "^[0-9]{2}$")) %>% # coicop aggregation level
+#    filter(NATURE == "INDICE") %>% # index
+#    filter(MENAGES_IPC == "ENSEMBLE") %>% # all kinds of household
+#    filter(REF_AREA == "FE") %>% # all France including overseas departements
+#    add_insee_title()
+#  
+#  list_idbank = df_idbank_list_selected %>% pull(idbank)
+#  
+#  data =
+#    get_insee_idbank(list_idbank, startPeriod = "2015-01") %>%
+#    split_title()
+#  
+#  data_plot = data %>%
+#    mutate(TITLE_EN6 = case_when(is.na(TITLE_EN6) ~ TITLE_EN5,
+#                              TRUE ~ as.character(TITLE_EN6))) %>%
+#    mutate(TITLE_EN6 = substr(TITLE_EN6, 1 , 22)) %>%
+#    mutate(month = month(DATE)) %>%
+#    arrange(DATE) %>%
+#    group_by(TITLE_EN6, month) %>%
+#    mutate(growth = 100 * (OBS_VALUE / dplyr::lag(OBS_VALUE) - 1))
+#  
+#  ggplot(data_plot, aes(x = DATE, y = growth)) +
+#    geom_col() +
+#    facet_wrap(~TITLE_EN6, scales = "free") +
+#    ggtitle("French inflation, by product category, year-on-year") +
+#    labs(subtitle = sprintf("Last updated : %s", data_plot$TIME_PERIOD[nrow(data_plot)]))
+#  
+

@@ -1,6 +1,6 @@
 #' Download a full INSEE's series key list
 #'
-#' @details Download a mapping dataset betwen INSEE series keys (idbank) and SDMX series names.
+#' @details Download a mapping dataset between INSEE series keys (idbank) and SDMX series names.
 #' Under the hood the get_idbank_list uses download.file function from utils, the user can change the mode argument with the following
 #' command : Sys.getenv(INSEE_download_option_idbank_list = "wb")
 #' If INSEE makes an update, the user can also change the zip file downloaded, the data file contained in the zip and data the separator  :
@@ -41,7 +41,7 @@ get_idbank_list = function(
   dir_creation_fail = try(create_insee_folder(), silent = TRUE)
 
   if(!"try-error" %in% class(dir_creation_fail)){
-    insee_local_dir = rappdirs::user_data_dir("insee")
+    insee_local_dir = file.path(rappdirs::user_data_dir(), "R", "insee", "insee")
   }else{
     insee_local_dir = tempdir()
   }
@@ -49,18 +49,6 @@ get_idbank_list = function(
   metadata_file_cache = file.path(insee_local_dir, paste0(openssl::md5("insee_metadata_file"), ".rds"))
 
   metadata_file_cache_date = file.path(insee_local_dir, paste0(openssl::md5("insee_metadata_file_date"), ".rds"))
-
-  file_warning_deprecated = file.path(tempdir(), paste0(openssl::md5("dimdeprecated"), ".rds"))
-
-  if(!file.exists(file_warning_deprecated)){
-    msg1 = "\n!!! The use of dim columns is DEPRECATED"
-    msg2 = "!!! First, please use datasets' name as input of this function"
-    msg3 = "!!! Then, please use new columns' name instead as FREQ and INDICATEUR etc"
-    msg4 = "This message is displayed once per R session"
-    msg = sprintf("%s\n%s\n%s\n%s\n", msg1, msg2, msg3, msg4)
-    message(crayon::style(msg, "red"))
-    save(msg, file = file_warning_deprecated)
-  }
 
   if(!is.null(dataset)){
     dataset_hash = paste0(dataset, collapse = "_")
@@ -95,33 +83,37 @@ get_idbank_list = function(
   # Check when was the last metadata update, update triggered if the metadata is older than 6 months
   #
 
-  auto = FALSE
+  # auto = FALSE
 
   if(file.exists(metadata_file_cache_date)){
 
     date_last_update = readRDS(metadata_file_cache_date)
 
     if(difftime(insee_today_date, date_last_update, units = "days") > 90){
-      update = TRUE
-      auto = TRUE
 
       msg = "\nMetadata is older than 3 months"
       message(crayon::style(sprintf("%s", msg), "red"))
+
+      user_answer <- as.character(readline(prompt="Do you want to update all metadata ? [y/n]"))
+
+      if (substr(user_answer, 1, 1) != "n"){
+        update = TRUE
+        # auto = TRUE
+      }else{
+        update = FALSE
+        # auto = FALSE
+      }
+
     }
 
   }else{
-    list_file_insee_local_dir = list.files(insee_local_dir)
 
-    if(length(list_file_insee_local_dir) > 1){
-      msg = "\nMetadata date file is missing"
-    }else{
-      msg = "\nMetadata files are missing"
-    }
+    msg = "\nMetadata files are missing"
 
     message(crayon::style(sprintf("%s", msg), "red"))
 
     update = TRUE
-    auto = TRUE
+
   }
 
   #
@@ -135,27 +127,35 @@ get_idbank_list = function(
                                         dataset_metadata_file_cache = dataset_metadata_file_cache)
     if(all(class(idbank_list) != "data.frame")){
       if(idbank_list == TRUE){
-        auto = TRUE
+        # auto = TRUE
         update = TRUE
       }
     }else{
+      col_to_keep = names(idbank_list)[!names(idbank_list) %in% c(paste0("dim", 1:50))]
+      idbank_list = idbank_list[,col_to_keep]
+      idbank_list = tibble::as_tibble(idbank_list)
+
+      # drop series if dataset is not available in the list
+      idbank_list = dplyr::filter(.data = idbank_list, .data$nomflow %in% dataset_list)
+
+      # drop series if not in internal list
+      idbank_internal = suppressMessages(search_insee())
+      idbank_list = dplyr::filter(.data = idbank_list, .data$idbank %in% idbank_internal$id)
+
+      # sort by alphebetical order
+      idbank_list = dplyr::arrange(.data = idbank_list, .data$nomflow)
       return(idbank_list)
     }
   }
 
     if(!file.exists(metadata_file_cache)){
       update = TRUE
-      auto = TRUE
+      # auto = TRUE
     }
 
     if(update){
-      if(auto){
-        msg1bis = "\nEither because it is older than 3 months, or because some files are missing"
-        # msg1 = sprintf("Metadata update has been triggered automatically%s", msg1bis)
-        msg1 = "Metadata update has been triggered automatically"
-      }else{
-        msg1 = "\nMetadata update has been triggered manually"
-      }
+
+      msg1 = "\nMetadata update has been triggered"
 
       msg2 = "\nIt may last several minutes"
       message(crayon::style(sprintf("%s %s", msg1, msg2), "red"))
@@ -185,8 +185,9 @@ get_idbank_list = function(
 
       }else{
 
+        today_date = as.character(lubridate::today())
         saveRDS(idbank_list, file = metadata_file_cache)
-        saveRDS(insee_today_date, file = metadata_file_cache_date)
+        saveRDS(today_date, file = metadata_file_cache_date)
 
         msg = sprintf("\nData cached : %s", metadata_file_cache)
         message(crayon::style(msg, "green"))
@@ -199,7 +200,22 @@ get_idbank_list = function(
                           dataset_metadata_file_cache = dataset_metadata_file_cache)
   )
 
+  # delete dim columns
+  col_to_keep = names(idbank_list)[!names(idbank_list) %in% c(paste0("dim", 1:50))]
+
+  idbank_list = idbank_list[,col_to_keep]
+
   idbank_list = tibble::as_tibble(idbank_list)
+
+  # drop series if dataset is not available in the list
+  idbank_list = dplyr::filter(.data = idbank_list, .data$nomflow %in% dataset_list)
+
+  # drop series if not in internal list
+  idbank_internal = suppressMessages(search_insee())
+  idbank_list = dplyr::filter(.data = idbank_list, .data$idbank %in% idbank_internal$id)
+
+  # sort by alphebetical order
+  idbank_list = dplyr::arrange(.data = idbank_list, .data$nomflow)
 
   return(idbank_list)
 

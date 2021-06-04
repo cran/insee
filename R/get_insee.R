@@ -40,7 +40,9 @@ get_insee = function(link, step = "1/1"){
     }
   }
 
-  file_cache = file.path(tempdir(), paste0(openssl::md5(link), ".rds"))
+  insee_data_dir = tempdir()
+
+  file_cache = file.path(insee_data_dir, paste0(openssl::md5(link), ".rds"))
 
   if((!file.exists(file_cache)) | insee_no_cache_use){
 
@@ -80,13 +82,16 @@ get_insee = function(link, step = "1/1"){
 
     if(!is.null(data_final)){
 
-      saveRDS(data_final, file = file_cache)
+      s = try(saveRDS(data_final, file = file_cache), silent = TRUE)
 
-      if(insee_download_verbose){
-        msg = sprintf("Data cached : %s\n", file_cache)
+      if(class(s) != "try-error"){
+        if(insee_download_verbose){
+          msg = sprintf("Data cached : %s\n", file_cache)
 
-        message(crayon::style(msg, "green"))
+          message(crayon::style(msg, "green"))
+        }
       }
+
     }else{
       msg = "An error occurred"
       message(crayon::style(msg, "red"))

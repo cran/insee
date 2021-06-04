@@ -1,3 +1,11 @@
+# insee 1.1.0
+
+* metadata are updated if a file is outdated, but this step now requires the user's approval
+* dim columns whose usage was previously deprecated are removed from idbank list dataframe (code breaks likely) 
+* new idbanks from 2021 list are included in the internal package data
+* all files created in the checks are stored in a temporary directory
+* DESCRIPTION : LazyData is FALSE
+
 # insee 1.0.0
 
 * if dataset names are provided, get clean metadata with `get_idbank_list` (code breaks likely). The metadata is then stored locally on the computer. The update is automatically done every 3 months, and can be manually triggered

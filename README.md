@@ -4,13 +4,11 @@ insee R package
  <br> 
  
  [![CRAN status](https://www.r-pkg.org/badges/version/insee)](https://cran.r-project.org/package=insee) 
- [![CRAN checks](https://cranchecks.info/badges/worst/insee)](https://cran.r-project.org/web/checks/check_results_insee.html) 
  [![Codecov test coverage](https://codecov.io/gh/InseeFr/R-Insee-Data/branch/master/graph/badge.svg)](https://codecov.io/gh/InseeFr/R-Insee-Data?branch=master) 
  [![lifecycle](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html) 
  [![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/insee)](https://cran.r-project.org/package=insee) 
  [![Downloads](https://cranlogs.r-pkg.org/badges/insee)](https://cran.r-project.org/package=insee) 
  [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/) 
- [![Build Status](https://travis-ci.org/InseeFr/R-Insee-Data.svg?branch=master)](https://travis-ci.org/InseeFr/R-Insee-Data) 
  [![R build status](https://github.com/hadrilec/insee/workflows/R-CMD-check/badge.svg)](https://github.com/InseeFr/R-Insee-Data/actions) 
 
 <br> 

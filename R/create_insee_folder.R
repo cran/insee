@@ -1,8 +1,9 @@
 #' @noRd
 create_insee_folder = function(){
 
-  insee_folder = file.path(rappdirs::user_data_dir(), "insee")
-  list_folders = c(insee_folder, file.path(insee_folder, "insee"))
+  r_folder = file.path(rappdirs::user_data_dir(), "R")
+  insee_folder = file.path(rappdirs::user_data_dir(), "R", "insee")
+  list_folders = c(r_folder, insee_folder, file.path(insee_folder, "insee"))
 
   for(ifile in 1:length(list_folders)){
     if(!file.exists(list_folders[ifile])){
@@ -14,7 +15,14 @@ create_insee_folder = function(){
   if(!file.exists(test_file)){
     test = 1
     saveRDS(test, file = test_file)
+    if (file.exists(test_file)){
+      file.remove(test_file)
+    }
   }
 
+  if (Sys.getenv("INSEE_metadata_folder") != ""){
+    # Make error on purpose
+    a = 1 + "1"
+  }
 
 }
