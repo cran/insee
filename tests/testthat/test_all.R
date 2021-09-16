@@ -12,9 +12,12 @@ test_that("class tests",{
 
   Sys.setenv(INSEE_metadata_folder = "tempdir")
 
+  insee_idbank_dataset_path = Sys.getenv("INSEE_idbank_dataset_path")
+
   Sys.setenv(INSEE_idbank_dataset_path = "https://www.insee.fr/en/statistiques/fichier/fake_file.zip")
   expect_equal(any(class(get_idbank_list("CLIMAT-AFFAIRES")) == 'data.frame'), TRUE)
-  Sys.setenv(INSEE_idbank_dataset_path = "https://www.insee.fr/en/statistiques/fichier/2868055/2021_correspondance_idbank_dimension.zip")
+  Sys.setenv(INSEE_idbank_dataset_path = insee_idbank_dataset_path)
+
 
   expect_equal(any(class(get_idbank_list("CLIMAT-AFFAIRES")) == 'data.frame'), TRUE)
   expect_equal(any(class(get_idbank_list(update = TRUE)) == 'data.frame'), TRUE)
@@ -58,7 +61,7 @@ test_that("class tests",{
                               lastNObservations = 1), "data.frame")
   expect_is(get_insee_dataset("IPC-2015", filter = "M+A.........CVS..", startPeriod = "2015-03"), "data.frame")
 
-  expect_is(get_insee_dataset("IPC-2015", filter = "A..SO...VARIATIONS_A....BRUT..SO",
+  expect_is(get_insee_dataset("IPC-2015", filter = "A..SO...VARIATIONS_A....BRUT...",
                               includeHistory = TRUE, updatedAfter = "2017-07-11T08:45:00"), "data.frame")
 
   expect_error(get_insee_dataset(1))
