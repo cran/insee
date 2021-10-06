@@ -39,10 +39,9 @@ get_idbank_list = function(
   }
 
   dir_creation_fail = try(create_insee_folder(), silent = TRUE)
+  insee_local_dir = file.path(rappdirs::user_data_dir(), "R", "insee", "insee")
 
-  if(!"try-error" %in% class(dir_creation_fail)){
-    insee_local_dir = file.path(rappdirs::user_data_dir(), "R", "insee", "insee")
-  }else{
+  if(("try-error" %in% class(dir_creation_fail))|(!file.exists(insee_local_dir))){
     insee_local_dir = tempdir()
   }
 
@@ -185,7 +184,7 @@ get_idbank_list = function(
 
       }else{
 
-        today_date = as.character(lubridate::today())
+        today_date = as.character(Sys.Date())
         saveRDS(idbank_list, file = metadata_file_cache)
         saveRDS(today_date, file = metadata_file_cache_date)
 
