@@ -27,6 +27,13 @@ library(prettydoc)
 #  Sys.setenv(https_proxy = "my_proxy_server")
 
 ## ---- message = FALSE, warning = FALSE, eval = FALSE--------------------------
+#  Sys.setenv(INSEE_download_option_method = "mymethod")
+#  Sys.setenv(INSEE_download_option_port = "1234")
+#  Sys.setenv(INSEE_download_option_extra = "-U : --proxy-myprotocol --proxy myproxy:1234")
+#  Sys.setenv(INSEE_download_option_proxy = "myproxy")
+#  Sys.setenv(INSEE_download_option_auth = "myprotocol")
+
+## ---- message = FALSE, warning = FALSE, eval = FALSE--------------------------
 #  # Get the development version from GitHub
 #  # install.packages("devtools")
 #  devtools::install_github("InseeFr/R-Insee-Data")

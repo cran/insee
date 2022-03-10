@@ -9,8 +9,8 @@
   Sys.setenv(INSEE_sdmx_link_dataset = "https://bdm.insee.fr/series/sdmx/data")
 
   Sys.setenv(INSEE_idbank_sep = ";")
-  Sys.setenv(INSEE_idbank_dataset_path = "https://www.insee.fr/en/statistiques/fichier/2868055/202201_correspondance_idbank_dimension.zip")
-  Sys.setenv(INSEE_idbank_dataset_file = "202201_correspondance_idbank_dimension")
+  Sys.setenv(INSEE_idbank_dataset_path = "https://www.insee.fr/en/statistiques/fichier/2868055/202203_correspondance_idbank_dimension.zip")
+  Sys.setenv(INSEE_idbank_dataset_file = "202203_correspondance_idbank_dimension")
 
   Sys.setenv(INSEE_last_release_link = "https://bdm.insee.fr/series/sdmx/rss/donnees")
   Sys.setenv(INSEE_idbank_nchar = 9)
@@ -22,11 +22,17 @@
                                        intToUtf8("0x2013")))
   Sys.setenv(INSEE_value_as_numeric = "TRUE")
   Sys.setenv(INSEE_download_verbose = "TRUE")
-  Sys.setenv(INSEE_download_option_idbank_list = "wb")
   Sys.setenv(INSEE_no_cache_use = "FALSE")
   Sys.setenv(INSEE_print_query = "FALSE")
   Sys.setenv(INSEE_today_date = as.character(Sys.Date()))
   Sys.setenv(INSEE_read_sdmx_fast = "FALSE")
+
+  Sys.setenv(INSEE_download_option_mode = "wb")
+  Sys.setenv(INSEE_download_option_method = "")
+  Sys.setenv(INSEE_download_option_port = "")
+  Sys.setenv(INSEE_download_option_extra = "")
+  Sys.setenv(INSEE_download_option_proxy = "")
+  Sys.setenv(INSEE_download_option_auth = "")
 
   # if different from the default value, it makes an error in create_insee_folder function
   # and all metadata files are stored in tempdir
