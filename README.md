@@ -18,7 +18,7 @@ The insee package contains tools to easily download data and metadata from INSEE
 
 Using embedded SDMX queries, get the data of more than 150 000 INSEE series.
 
-Have a look at the detailed SDMX web service page with the following [link](https://www.insee.fr/en/information/2868055).
+Have a look at the detailed SDMX web service page on insee.fr.
 
 This package is a contribution to reproducible research and public data transparency. It benefits from the developments made by INSEE's teams working on APIs.
 
@@ -205,19 +205,20 @@ FranceMap_tidy_final_all =
                                    pop_density >= 260 & pop_density < 410 ~ "[260, 410]",
                                    pop_density >= 410 & pop_density < 600 ~ "[410, 600]",
                                    pop_density >= 600 & pop_density < 1000 ~ "[600, 1000]",
+                                   pop_density >= 1000 & pop_density < 5000 ~ "[1000, 5000]",
                                    pop_density >= 5000 & pop_density < 10000 ~ "[5000, 10000]",
                                    pop_density >= 20000 ~ ">= 20000"
   )) %>% 
   mutate(`people per square kilometer` = factor(density_range,
-                                levels = c("< 40","[40, 50]", "[50, 70]","[70, 100]",
-                                           "[100, 120]", "[120, 160]", "[160, 200]",
-                                           "[200, 240]", "[240, 260]", "[260, 410]",
-                                           "[410, 600]",  "[600, 1000]",
-                                           "[5000, 10000]", ">= 20000")))
+                                                levels = c("< 40","[40, 50]", "[50, 70]","[70, 100]",
+                                                           "[100, 120]", "[120, 160]", "[160, 200]",
+                                                           "[200, 240]", "[240, 260]", "[260, 410]",
+                                                           "[410, 600]",  "[600, 1000]", "[1000, 5000]",
+                                                           "[5000, 10000]", ">= 20000")))
 
 ggplot(data = FranceMap_tidy_final_all,
-               aes(fill = `people per square kilometer`, x = long, y = lat, group = group) ,
-               size = 0, alpha = 0.9) +
+       aes(fill = `people per square kilometer`, x = long, y = lat, group = group) ,
+       size = 0, alpha = 0.9) +
   geom_polygon() +
   geom_path(colour = "white") +
   coord_map() +
@@ -225,7 +226,6 @@ ggplot(data = FranceMap_tidy_final_all,
   scale_fill_viridis(discrete = T) + 
   ggtitle("Distribution of the population within French territory in 2020") +
   labs(subtitle = "the density displayed here is an approximation, it should not be considered as an official statistics")
-  
   
 ```
 

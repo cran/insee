@@ -2,6 +2,8 @@
 #' @noRd
 .onLoad <- function(libname, pkgname){
 
+  # options(download.file.method="curl", download.file.extra="-k -L")
+
   Sys.setenv(INSEE_sdmx_link_codelist = "https://www.bdm.insee.fr/series/sdmx/codelist/FR1")
   Sys.setenv(INSEE_sdmx_link_datastructure = "https://www.bdm.insee.fr/series/sdmx/datastructure/FR1")
   Sys.setenv(INSEE_sdmx_link_dataflow = "https://bdm.insee.fr/series/sdmx/dataflow")
@@ -9,8 +11,8 @@
   Sys.setenv(INSEE_sdmx_link_dataset = "https://bdm.insee.fr/series/sdmx/data")
 
   Sys.setenv(INSEE_idbank_sep = ";")
-  Sys.setenv(INSEE_idbank_dataset_path = "https://www.insee.fr/en/statistiques/fichier/2868055/202203_correspondance_idbank_dimension.zip")
-  Sys.setenv(INSEE_idbank_dataset_file = "202203_correspondance_idbank_dimension")
+  Sys.setenv(INSEE_idbank_dataset_path = "https://www.insee.fr/en/statistiques/fichier/2868055/202209_correspondance_idbank_dimension.zip")
+  Sys.setenv(INSEE_idbank_dataset_file = "202209_correspondance_idbank_dimension")
 
   Sys.setenv(INSEE_last_release_link = "https://bdm.insee.fr/series/sdmx/rss/donnees")
   Sys.setenv(INSEE_idbank_nchar = 9)

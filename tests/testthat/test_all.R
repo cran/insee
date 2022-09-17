@@ -44,9 +44,9 @@ test_that("class tests",{
   insee_query = file.path(insee_link, paste0(idbank_test1,"?", "firstNObservations=1"))
 
   # test readsdmx parser
-  Sys.setenv(INSEE_read_sdmx_fast = "TRUE")
-  expect_equal(any(class(get_insee(insee_query)) == 'data.frame'), TRUE)
-  Sys.setenv(INSEE_read_sdmx_fast = "FALSE")
+  # Sys.setenv(INSEE_read_sdmx_fast = "TRUE")
+  # expect_equal(any(class(get_insee(insee_query)) == 'data.frame'), TRUE)
+  # Sys.setenv(INSEE_read_sdmx_fast = "FALSE")
 
   expect_is(get_insee(), "NULL")
   expect_is(get_insee(""), "NULL")
@@ -80,10 +80,10 @@ test_that("class tests",{
   expect_is(search_insee(""), "data.frame")
   expect_is(search_insee(NULL), "data.frame")
 
-  Sys.setenv("INSEE_download_option_idbank_list" = "a")
-  expect_is(download_idbank_list(label = TRUE), "data.frame")
-  expect_is(download_idbank_list(dataset = "CNA-2010-TOF", label = TRUE), "data.frame")
-  expect_warning(download_idbank_list("a"))
+  # Sys.setenv("INSEE_download_option_idbank_list" = "a")
+  # expect_error(download_idbank_list(label = TRUE))
+  # expect_is(download_idbank_list(dataset = "CNA-2010-TOF", label = TRUE), "data.frame")
+  # expect_warning(download_idbank_list("a"))
 
   expect_is(get_column_title("CNA-2014-CONSO-MEN"), "data.frame")
   expect_is(get_column_title("CNA-2014-CONSO-MEN"), "data.frame")
@@ -159,21 +159,21 @@ test_that("output tests",{
 
   expect_equal(is.null(get_idbank_list("a")), TRUE)
 
-  expect_equal("data.frame" %in%
-                 class(read_dataset_metadata(dataset = c("BALANCE-PAIEMENTS", "CLIMAT-AFFAIRES"))), TRUE)
+  # expect_equal("data.frame" %in%
+  #                class(read_dataset_metadata(dataset = c("BALANCE-PAIEMENTS", "CLIMAT-AFFAIRES"))), TRUE)
 
   Sys.setenv("INSEE_download_verbose" = "FALSE")
   link = "https://bdm.insee.fr/series/sdmx/data/IPC-2015"
 
   expect_is(get_insee_dataset("IPC-2015"), "NULL")
   expect_is(read_sdmx_slow(link), "NULL")
-  expect_is(read_sdmx_fast(link), "NULL")
+  # expect_is(read_sdmx_fast(link), "NULL")
 
   # columns name and fixed order
-  link = "https://bdm.insee.fr/series/sdmx/data/CLIMAT-AFFAIRES"
-  df_slow = read_sdmx_slow(link)
-  df_fast = read_sdmx_fast(link)
-  expect_equal(all(names(df_slow) == names(df_fast)), TRUE)
+  # link = "https://bdm.insee.fr/series/sdmx/data/CLIMAT-AFFAIRES"
+  # df_slow = read_sdmx_slow(link)
+  # df_fast = read_sdmx_fast(link)
+  # expect_equal(all(names(df_slow) == names(df_fast)), TRUE)
 
   # expect_warning(clean_insee_folder(), regexp = NA)
   # expect_equal(read_dataset_metadata("CLIMAT-AFFAIRES"), TRUE)
