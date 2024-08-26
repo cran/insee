@@ -4,7 +4,9 @@
 NOT_CRAN <- identical(tolower(Sys.getenv("NOT_CRAN")),"true")
 knitr::opts_chunk$set(purl = NOT_CRAN)
 library(insee)
-library(tidyverse)
+library(dplyr)
+library(magrittr)
+library(stringr)
 
 embed_png <- function(path, dpi = NULL) {
   meta <- attr(png::readPNG(path, native = TRUE, info = TRUE), "info")
@@ -18,22 +20,21 @@ embed_png <- function(path, dpi = NULL) {
 
 ## ----message=FALSE, warning=FALSE, include=FALSE------------------------------
 library(kableExtra)
-library(magrittr)
 library(htmltools)
 library(prettydoc)
 
-## ---- message = FALSE, warning = FALSE, eval = FALSE--------------------------
+## ----message = FALSE, warning = FALSE, eval = FALSE---------------------------
 #  Sys.setenv(http_proxy = "my_proxy_server")
 #  Sys.setenv(https_proxy = "my_proxy_server")
 
-## ---- message = FALSE, warning = FALSE, eval = FALSE--------------------------
+## ----message = FALSE, warning = FALSE, eval = FALSE---------------------------
 #  Sys.setenv(INSEE_download_option_method = "mymethod")
 #  Sys.setenv(INSEE_download_option_port = "1234")
 #  Sys.setenv(INSEE_download_option_extra = "-U : --proxy-myprotocol --proxy myproxy:1234")
 #  Sys.setenv(INSEE_download_option_proxy = "myproxy")
 #  Sys.setenv(INSEE_download_option_auth = "myprotocol")
 
-## ---- message = FALSE, warning = FALSE, eval = FALSE--------------------------
+## ----message = FALSE, warning = FALSE, eval = FALSE---------------------------
 #  # Get the development version from GitHub
 #  # install.packages("devtools")
 #  devtools::install_github("InseeFr/R-Insee-Data")
@@ -43,9 +44,8 @@ library(prettydoc)
 #  
 #  # library Loading
 #  library(insee)
-#  library(tidyverse)
 
-## ---- message = FALSE, warning = FALSE, eval = FALSE--------------------------
+## ----message = FALSE, warning = FALSE, eval = FALSE---------------------------
 #  insee_dataset = get_dataset_list()
 
 ## ----echo = FALSE, message = FALSE, warning = FALSE, eval = FALSE-------------
@@ -57,7 +57,7 @@ library(prettydoc)
 #    kable(row.names=NA) %>%
 #    kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
-## ---- message=FALSE,warning=FALSE,eval=FALSE----------------------------------
+## ----message=FALSE,warning=FALSE,eval=FALSE-----------------------------------
 #  idbank_list = get_idbank_list('BALANCE-PAIEMENTS')
 
 ## ----echo=FALSE, message=FALSE, warning=FALSE,eval=FALSE----------------------
@@ -99,7 +99,7 @@ library(prettydoc)
 #  data_all = search_insee()
 
 ## ----message=FALSE, warning=FALSE,eval=FALSE----------------------------------
-#  library(tidyverse)
+#  
 #  library(insee)
 #  
 #  # the user can make a manual list of idbanks to get the data

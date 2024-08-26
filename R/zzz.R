@@ -1,7 +1,7 @@
 
 #' @noRd
 .onLoad <- function(libname, pkgname){
-
+  #
   # options(download.file.method="curl", download.file.extra="-k -L")
 
   Sys.setenv(INSEE_sdmx_link_codelist = "https://www.bdm.insee.fr/series/sdmx/codelist/FR1")
@@ -37,6 +37,6 @@
   Sys.setenv(INSEE_download_option_auth = "")
 
   # if different from the default value, it makes an error in create_insee_folder function
-  # and all metadata files are stored in tempdir
+  # and all metadata files are stored in tempdir #
   Sys.setenv(INSEE_metadata_folder = "")
 }

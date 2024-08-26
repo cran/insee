@@ -3,7 +3,6 @@
 NOT_CRAN <- identical(tolower(Sys.getenv("NOT_CRAN")),"true")
 knitr::opts_chunk$set(purl = NOT_CRAN)
 library(insee)
-library(tidyverse)
 
 embed_png <- function(path, dpi = NULL) {
   meta <- attr(png::readPNG(path, native = TRUE, info = TRUE), "info")
@@ -17,16 +16,18 @@ embed_png <- function(path, dpi = NULL) {
 
 ## ----message=FALSE, warning=FALSE, include=FALSE------------------------------
 library(kableExtra)
-library(magrittr)
 library(htmltools)
 library(prettydoc)
 
-## ---- echo = FALSE------------------------------------------------------------
+## ----echo = FALSE-------------------------------------------------------------
 embed_png("pop_map.png")
 
 ## ----message=FALSE, warning=FALSE,eval=FALSE----------------------------------
 #  library(insee)
-#  library(tidyverse)
+#  library(ggplot2)
+#  library(dplyr)
+#  library(magrittr)
+#  library(stringr)
 #  
 #  library(raster)
 #  library(rgdal)

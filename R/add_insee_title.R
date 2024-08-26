@@ -11,7 +11,8 @@
 #' @return the same dataframe but with one or several title columns
 #' @examples
 #' \donttest{
-#'library(tidyverse)
+#'library(magrittr)
+#'library(dplyr)
 #'
 #'idbank_empl =
 #'  get_idbank_list("EMPLOI-SALARIE-TRIM-NATIONAL") %>% #employment
@@ -45,7 +46,7 @@ add_insee_title = function(df, n_split, lang = "en", split = TRUE, clean = TRUE)
         }
       }
       if(clean){
-        df = insee::clean_table(df)
+        df = clean_table(df)
       }
     }
   }

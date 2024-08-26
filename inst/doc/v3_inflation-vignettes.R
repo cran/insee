@@ -3,7 +3,6 @@
 NOT_CRAN <- identical(tolower(Sys.getenv("NOT_CRAN")),"true")
 knitr::opts_chunk$set(purl = NOT_CRAN)
 library(insee)
-library(tidyverse)
 
 embed_png <- function(path, dpi = NULL) {
   meta <- attr(png::readPNG(path, native = TRUE, info = TRUE), "info")
@@ -15,22 +14,23 @@ embed_png <- function(path, dpi = NULL) {
     " />"
   ))}
 
-## ---- echo = FALSE------------------------------------------------------------
+## ----echo = FALSE-------------------------------------------------------------
 embed_png("inflation.png")
 
 ## ----message=FALSE, warning=FALSE, include=FALSE------------------------------
 library(kableExtra)
-library(magrittr)
 library(htmltools)
 library(prettydoc)
 
 ## ----message = FALSE, warning=FALSE, eval = FALSE-----------------------------
 #  # please download the Github version
 #  # devtools::install_github("InseeFr/R-Insee-Data")
-#  library(tidyverse)
+#  
 #  library(lubridate)
 #  library(insee)
-#  
+#  library(ggplot2)
+#  library(dplyr)
+#  library(magrittr)
 #  
 #  df_idbank_list_selected =
 #    get_idbank_list("IPC-2015") %>% #Inflation dataset

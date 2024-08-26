@@ -3,7 +3,6 @@
 NOT_CRAN <- identical(tolower(Sys.getenv("NOT_CRAN")),"true")
 knitr::opts_chunk$set(purl = NOT_CRAN)
 library(insee)
-library(tidyverse)
 
 embed_png <- function(path, dpi = NULL) {
   meta <- attr(png::readPNG(path, native = TRUE, info = TRUE), "info")
@@ -17,15 +16,16 @@ embed_png <- function(path, dpi = NULL) {
 
 ## ----message=FALSE, warning=FALSE, include=FALSE------------------------------
 library(kableExtra)
-library(magrittr)
 library(htmltools)
 library(prettydoc)
 
-## ---- echo = FALSE------------------------------------------------------------
+## ----echo = FALSE-------------------------------------------------------------
 embed_png("gdp.png")
 
 ## ----message=FALSE, warning=FALSE, eval=FALSE---------------------------------
-#  library(tidyverse)
+#  library(magrittr)
+#  library(dplyr)
+#  library(ggplot2)
 #  library(insee)
 #  
 #  df_idbank_list_selected =
